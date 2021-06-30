@@ -96,6 +96,10 @@ bool THttpClient::parseStatusLine(char* status) {
   }
 }
 
+void THttpClient::addHeader(const std::string& key, const std::string& value) {
+  headers_[key] = value;
+}
+
 void THttpClient::flush() {
   resetConsumedMessageSize();
   // Fetch the contents of the write buffer
@@ -107,8 +111,13 @@ void THttpClient::flush() {
   std::ostringstream h;
   h << "POST " << path_ << " HTTP/1.1" << CRLF << "Host: " << host_ << CRLF
     << "Content-Type: application/x-thrift" << CRLF << "Content-Length: " << len << CRLF
-    << "Accept: application/x-thrift" << CRLF << "User-Agent: Thrift/" << PACKAGE_VERSION
-    << " (C++/THttpClient)" << CRLF << CRLF;
+    << "Accept: application/x-thrift";
+
+  for (auto& head : headers_) {
+     h << CRLF << head.first << ": " << head.second;
+  }
+
+  h << CRLF << CRLF;
   string header = h.str();
 
   if (header.size() > (std::numeric_limits<uint32_t>::max)())
