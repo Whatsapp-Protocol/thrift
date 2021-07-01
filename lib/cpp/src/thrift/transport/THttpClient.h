@@ -38,11 +38,16 @@ public:
   void flush() override;
 
   void addHeader(const std::string& key, const std::string& value);
+  void clearHeaders();
+
+  void setDefaultHeaders(const std::map<std::string, std::string>& headers);
   
 protected:
   std::string host_;
   std::string path_;
   std::map<std::string, std::string> headers_;
+
+  std::map<std::string, std::string> default_headers_;
 
   void parseHeader(char* header) override;
   bool parseStatusLine(char* status) override;

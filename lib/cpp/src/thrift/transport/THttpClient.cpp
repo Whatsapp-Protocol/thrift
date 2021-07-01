@@ -96,6 +96,15 @@ void THttpClient::addHeader(const std::string& key, const std::string& value) {
   headers_[key] = value;
 }
 
+void THttpClient::clearHeaders() {
+  headers_.clear();
+}
+
+
+ void THttpClient::setDefaultHeaders(const std::map<std::string, std::string>& headers) {
+   default_headers_ = headers;
+ }
+
 void THttpClient::flush() {
   // Fetch the contents of the write buffer
   uint8_t* buf;
@@ -104,9 +113,12 @@ void THttpClient::flush() {
 
   // Construct the HTTP header
   std::ostringstream h;
-  h << "POST " << path_ << " HTTP/1.1" << CRLF << "Host: " << host_ << CRLF
-    << "Content-Type: application/x-thrift" << CRLF << "Content-Length: " << len << CRLF
-    << "Accept: application/x-thrift";
+  h << "POST " << path_ << " HTTP/1.1" << CRLF << "Host: " << host_ << CRLF << "Content-Length: " << len;
+
+
+  for (auto& head : default_headers_) {
+     h << CRLF << head.first << ": " << head.second;
+  }
 
   for (auto& head : headers_) {
      h << CRLF << head.first << ": " << head.second;
